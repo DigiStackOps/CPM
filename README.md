@@ -24,12 +24,15 @@
 ### VM: vm-backend (Node)
 1. Launch EC2 (Ubuntu), open port 22 and 4000 from frontend or LB.
 2. Install Node 18+, Git, Nginx (optional), and PM2 or systemd.
+```
+    sudo chown -R ec2-user:ec2-user /home/ec2-user/CPM/
+```
    ```bash
    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
    sudo apt-get install -y nodejs git
    sudo npm install -g pm2
    ```
-3. Clone repo and configure env:
+4. Clone repo and configure env:
    ```bash
    sudo mkdir -p /opt/admin-backend
    sudo chown ubuntu:ubuntu /opt/admin-backend
@@ -42,7 +45,7 @@
    pm2 start src/server.js --name admin-backend
    pm2 save
    ```
-4. Or use systemd unit (create `/etc/systemd/system/admin-backend.service`) with ExecStart `node /opt/admin-backend/src/server.js` and environment file.
+5. Or use systemd unit (create `/etc/systemd/system/admin-backend.service`) with ExecStart `node /opt/admin-backend/src/server.js` and environment file.
 
 ### VM: vm-frontend (Nginx)
 1. Launch EC2 (Ubuntu), open ports 80/443.
