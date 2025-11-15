@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="001-create-employee-table" author="dev">
+    <createTable tableName="employee">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="full_name" type="VARCHAR(255)"/>
+      <column name="email" type="VARCHAR(255)">
+        <constraints unique="true" nullable="false"/>
+      </column>
+      <column name="password_hash" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="mobile" type="VARCHAR(30)"/>
+      <column name="city" type="VARCHAR(100)"/>
+      <column name="gender" type="VARCHAR(10)" defaultValue="Male"/>
+      <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+      <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+    </createTable>
+  </changeSet>
+
+</databaseChangeLog>
