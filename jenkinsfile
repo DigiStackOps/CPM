@@ -1,0 +1,64 @@
+pipeline {
+  agent any
+  environment {
+    FRONTEND_HOST = "${params.FRONTEND_HOST}"
+    BACKEND_HOST = "${params.BACKEND_HOST}"
+    DB_HOST = "${params.DB_HOST}"
+    SSH_CREDENTIALS_ID = 'ec2-ssh-key' // set in Jenkins credentials
+  }
+  parameters {
+    string(name: 'FRONTEND_HOST', defaultValue: '1.2.3.4')
+    string(name: 'BACKEND_HOST', defaultValue: '1.2.3.5')
+    string(name: 'DB_HOST', defaultValue: '1.2.3.6')
+  }
+  stages {
+    stage('Checkout') { steps { checkout scm } }
+
+    stage('Backend - install & test') {
+      agent { label 'linux' }
+      steps {
+        dir('backend'){
+          sh 'npm ci'
+          sh 'npm test'
+        }
+      }
+    }
+
+    stage('DB - Migrate (Liquibase)'){
+      steps{
+        // Assumes liquibase is installed on Jenkins agent or use a docker container
+        sh "liquibase --url=\"jdbc:mysql://${env.DB_HOST}:3306/AdminDB\" --username=${DB_USER} --password=${DB_PASS} --changeLogFile=db/liquibase/changelog-master.xml update"
+      }
+    }
+
+    stage('Build Frontend'){
+      steps{
+        dir('frontend'){
+          sh 'npm ci'
+          sh 'npm run build'
+        }
+      }
+    }
+
+    stage('Deploy Frontend'){
+      steps{
+        withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'KEY')]){
+          sh "scp -i $KEY -r frontend/dist/* ec2-user@${env.FRONTEND_HOST}:/var/www/admin-portal/"
+          sh "ssh -i $KEY ec2-user@${env.FRONTEND_HOST} 'sudo systemctl restart nginx'"
+        }
+      }
+    }
+
+    stage('Deploy Backend'){
+      steps{
+        withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS_ID, keyFileVariable: 'KEY')]){
+          sh "scp -i $KEY -r backend/* ec2-user@${env.BACKEND_HOST}:/opt/admin-backend/"
+          sh "ssh -i $KEY ec2-user@${env.BACKEND_HOST} 'cd /opt/admin-backend && npm ci --production && sudo systemctl restart admin-backend'"
+        }
+      }
+    }
+  }
+  post {
+    failure { mail to: 'devops-team@example.com', subject: "Build failed: ${env.JOB_NAME}", body: 'See Jenkins' }
+  }
+}
