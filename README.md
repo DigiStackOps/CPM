@@ -37,6 +37,7 @@
    cd /opt/admin-backend/backend
    cp .env.example .env
    # edit .env to point DB_HOST to vm-db private IP and DB credentials
+   npm install
    npm ci
    pm2 start src/server.js --name admin-backend
    pm2 save
@@ -54,6 +55,7 @@
    cd /tmp
    git clone <repo>
    cd repo/frontend
+   npm install
    npm ci
    npm run build
    sudo mkdir -p /var/www/admin-portal
