@@ -1,0 +1,6 @@
+body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;margin:0}
+.page-center{display:flex;align-items:center;justify-content:center;height:80vh}
+.card{background:#fff;padding:24px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.08);width:320px;display:flex;flex-direction:column;gap:8px}
+input,select{padding:8px;border-radius:6px;border:1px solid #ddd}
+button{padding:10px;border-radius:8px;border:none;background:#2563eb;color:#fff;font-weight:600}
+.error{background:#fff3f2;border:1px solid #fca5a5;padding:8px;border-radius:6px}
